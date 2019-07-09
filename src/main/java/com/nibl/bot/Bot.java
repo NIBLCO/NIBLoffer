@@ -1,95 +1,58 @@
 package com.nibl.bot;
 
 import java.io.IOException;
-import javax.net.ssl.SSLSocketFactory;
-
-import org.pircbotx.Configuration;
-import org.pircbotx.Configuration.Builder;
+import java.util.concurrent.ExecutionException;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nibl.bot.autoadd.AutoaddService;
-import com.nibl.bot.packlist.PacklistService;
+import com.nibl.bot.service.ServiceManager;
+import com.nibl.bot.service.autoadd.AutoaddService;
 
 public class Bot {
 
-	private Logger log = LoggerFactory.getLogger(Bot.class);
+    private Logger log = LoggerFactory.getLogger(Bot.class);
 
-	private PircBotX pircBotX;
+    private PircBotX pircBotX = new PircBotX(BotConfiguration.createConfiguration(this));;
 
-	// TODO change these to factory method
-	private AutoaddService autoaddService = new AutoaddService(this);
-	private PacklistService packlistService = new PacklistService(this);
+    private ServiceManager serviceManager;
 
-	private void autoAddService() {
-		new Thread(autoaddService).start();
-	}
+    public Bot() throws IOException, IrcException, InterruptedException, ExecutionException {
+        initializeResources();
+        pircBotX.startBot();
+    }
 
-	public AutoaddService getAutoaddService() {
-		return autoaddService;
-	}
+    private void initializeResources() throws InterruptedException, ExecutionException {
+        Integer maxTransfers = 10;
+        this.setServiceManager(new ServiceManager(this, maxTransfers, 1));
 
-	public PacklistService getPacklistService() {
-		return packlistService;
-	}
+        // Run Autoadd once before startup
+        log.info("Running Autoadd service once before startup");
+        this.getServiceManager().addService(new AutoaddService(this, true)).get();
 
-	public Bot() throws IOException, IrcException {
-		autoAddService();
+        // Add scheduled AutoaddService every 60s
+        this.getServiceManager().addScheduledService(new AutoaddService(this), 60, 60);
+    }
 
-		pircBotX = new PircBotX(this.createConfiguration());
-		pircBotX.startBot();
-	}
+    public PircBotX getPircBotX() {
+        return pircBotX;
+    }
 
-	public static void main(String[] args) {
-		try {
-			new Bot();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public void setPircBotX(PircBotX pircBotX) {
+        this.pircBotX = pircBotX;
+    }
 
-	private Configuration createConfiguration() {
+    public ServiceManager getServiceManager() {
+        return serviceManager;
+    }
 
-		Builder cb = new Configuration.Builder();
-		cb.setName("FileBoyz");
-		cb.addAutoJoinChannel("#frog");
-		cb.setVersion("GomuGomu");
-		cb.setFinger("Watch where you are poking");
-		cb.setLogin("FileBoy");
-		cb.addServer("irc.rizon.net", 9999);
-		cb.addListener(new Listener(this));
-		cb.setMessageDelay(500);
-		cb.setAutoNickChange(true);
-		cb.setAutoReconnect(true);
-		cb.setSocketFactory(SSLSocketFactory.getDefault());
-		// List<Integer> dccPorts = new ArrayList<>();
-		// dccPorts.add(47470);
-		// dccPorts.add(47471);
-		// dccPorts.add(47472);
-		// dccPorts.add(47473);
-		// cb.setDccPorts(dccPorts);
-		cb.setDccTransferBufferSize(1024);
-//        try {
-//            cb.setDccPublicAddress(InetAddress.getByName("116.203.134.128"));
-//        } catch (UnknownHostException e) {
-//            log.error("Unable to set DCC Public IP Address!!", e);
-//        }
+    public void setServiceManager(ServiceManager serviceManager) {
+        this.serviceManager = serviceManager;
+    }
 
-		return cb.buildConfiguration();
-	}
-
-	public PircBotX getBot() {
-		return this.pircBotX;
-	}
-
-	public PircBotX getPircBotX() {
-		return pircBotX;
-	}
-
-	public void setPircBotX(PircBotX pircBotX) {
-		this.pircBotX = pircBotX;
-	}
+    public static void main(String[] args) throws Exception {
+        new Bot();
+    }
 
 }

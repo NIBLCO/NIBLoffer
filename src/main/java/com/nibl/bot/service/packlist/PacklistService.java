@@ -1,4 +1,4 @@
-package com.nibl.bot.packlist;
+package com.nibl.bot.service.packlist;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,24 +15,24 @@ import com.nibl.bot.Bot;
 import com.nibl.bot.model.BotDirectory;
 import com.nibl.bot.model.BotFile;
 import com.nibl.bot.model.BotPacklist;
+import com.nibl.bot.service.Service;
 
-public class PacklistService {
+public class PacklistService extends Service {
 
-	private Logger log = LoggerFactory.getLogger(PacklistService.class);
+	private static Logger log = LoggerFactory.getLogger(PacklistService.class);
 
-	private Bot myBot;
 	private static BotPacklist packlist = new BotPacklist();
 	private static BotFile packlistFile = new BotFile();
 
 	public PacklistService(Bot myBot) {
-		this.myBot = myBot;
+		super(myBot);
 	}
 
-	public BotPacklist getPacklist() {
+	public static BotPacklist getPacklist() {
 		return packlist;
 	}
 
-	public void makePacklist(BotDirectory directory) {
+	public static void makePacklist(BotDirectory directory) {
 		packlist.setFiles(orderPacklist(recurseDirectory(directory, new BotPacklist())));
 		try {
 			outputPacklist();
@@ -44,7 +44,7 @@ public class PacklistService {
 		}
 	}
 
-	private BotPacklist recurseDirectory(BotDirectory directory, BotPacklist packlist) {
+	private static BotPacklist recurseDirectory(BotDirectory directory, BotPacklist packlist) {
 		for (BotDirectory file : directory.getSubDirectories().values()) {
 			recurseDirectory(file, packlist);
 		}
@@ -54,12 +54,12 @@ public class PacklistService {
 		return packlist;
 	}
 
-	private List<BotFile> orderPacklist(BotPacklist packlist) {
+	private static List<BotFile> orderPacklist(BotPacklist packlist) {
 		return packlist.getFiles().stream().sorted(Comparator.comparingInt(BotFile::getId))
 				.collect(Collectors.toList());
 	}
 
-	public BotFile getBotFileByPackNumber(Integer packNumber) {
+	public static BotFile getBotFileByPackNumber(Integer packNumber) {
 		if (packNumber == -1) {
 			return packlistFile;
 		}
@@ -70,7 +70,7 @@ public class PacklistService {
 		}
 	}
 
-	private void outputPacklist() throws IOException {
+	private static void outputPacklist() throws IOException {
 		long totalOffered = 0;
 		StringBuilder output = new StringBuilder();
 		output.append("** To request a file, type \"/MSG " + myBot.getPircBotX().getNick() + " XDCC SEND x\" **");
@@ -86,5 +86,10 @@ public class PacklistService {
 		output.append("Total Offered: " + FileUtils.byteCountToDisplaySize(totalOffered));
 		Files.write(Paths.get(myBot.getPircBotX().getNick() + ".txt"), output.toString().getBytes());
 	}
+
+    @Override
+    public void executeTask() {
+
+    }
 
 }
