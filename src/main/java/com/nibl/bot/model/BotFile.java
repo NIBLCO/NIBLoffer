@@ -66,5 +66,4 @@ public class BotFile {
     public void setGets(Integer gets) {
         this.gets = gets;
     }
-
 }

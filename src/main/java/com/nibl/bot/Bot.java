@@ -1,10 +1,6 @@
 package com.nibl.bot;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.pircbotx.Configuration;
@@ -14,82 +10,86 @@ import org.pircbotx.exception.IrcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nibl.bot.autoadd.Autoadd;
+import com.nibl.bot.autoadd.AutoaddService;
+import com.nibl.bot.packlist.PacklistService;
 
 public class Bot {
 
-    private Logger log = LoggerFactory.getLogger(Bot.class);
+	private Logger log = LoggerFactory.getLogger(Bot.class);
 
-    private PircBotX pircBotX;
-    private Autoadd autoadd = new Autoadd();
+	private PircBotX pircBotX;
 
-    public Bot() throws IOException, IrcException {
-        autoAddService();
+	// TODO change these to factory method
+	private AutoaddService autoaddService = new AutoaddService(this);
+	private PacklistService packlistService = new PacklistService(this);
 
-        pircBotX = new PircBotX(this.createConfiguration());
-        pircBotX.startBot();
-    }
+	private void autoAddService() {
+		new Thread(autoaddService).start();
+	}
 
-    public static void main(String[] args) {
-        try {
-            new Bot();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	public AutoaddService getAutoaddService() {
+		return autoaddService;
+	}
 
-    private Configuration createConfiguration() {
+	public PacklistService getPacklistService() {
+		return packlistService;
+	}
 
-        Builder cb = new Configuration.Builder();
-        cb.setName("FileBoyz");
-        cb.addAutoJoinChannel("#frog");
-        cb.setVersion("GomuGomu");
-        cb.setFinger("Watch where you are poking");
-        cb.setLogin("FileBoy");
-        cb.addServer("irc.rizon.net", 9999);
-        cb.addListener(new Listener(this));
-        cb.setMessageDelay(500);
-        cb.setAutoNickChange(true);
-        cb.setAutoReconnect(true);
-        cb.setSocketFactory(SSLSocketFactory.getDefault());
-        // List<Integer> dccPorts = new ArrayList<>();
-        // dccPorts.add(47470);
-        // dccPorts.add(47471);
-        // dccPorts.add(47472);
-        // dccPorts.add(47473);
-        // cb.setDccPorts(dccPorts);
-        cb.setDccTransferBufferSize(1024*100);
-        try {
-            cb.setDccPublicAddress(InetAddress.getByName("116.203.134.128"));
-        } catch (UnknownHostException e) {
-            log.error("Unable to set DCC Public IP Address!!", e);
-        }
+	public Bot() throws IOException, IrcException {
+		autoAddService();
 
-        return cb.buildConfiguration();
-    }
+		pircBotX = new PircBotX(this.createConfiguration());
+		pircBotX.startBot();
+	}
 
-    public PircBotX getBot() {
-        return this.pircBotX;
-    }
+	public static void main(String[] args) {
+		try {
+			new Bot();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    private void autoAddService() {
-        new Thread(autoadd).start();
-    }
+	private Configuration createConfiguration() {
 
-    public PircBotX getPircBotX() {
-        return pircBotX;
-    }
+		Builder cb = new Configuration.Builder();
+		cb.setName("FileBoyz");
+		cb.addAutoJoinChannel("#frog");
+		cb.setVersion("GomuGomu");
+		cb.setFinger("Watch where you are poking");
+		cb.setLogin("FileBoy");
+		cb.addServer("irc.rizon.net", 9999);
+		cb.addListener(new Listener(this));
+		cb.setMessageDelay(500);
+		cb.setAutoNickChange(true);
+		cb.setAutoReconnect(true);
+		cb.setSocketFactory(SSLSocketFactory.getDefault());
+		// List<Integer> dccPorts = new ArrayList<>();
+		// dccPorts.add(47470);
+		// dccPorts.add(47471);
+		// dccPorts.add(47472);
+		// dccPorts.add(47473);
+		// cb.setDccPorts(dccPorts);
+		cb.setDccTransferBufferSize(1024);
+//        try {
+//            cb.setDccPublicAddress(InetAddress.getByName("116.203.134.128"));
+//        } catch (UnknownHostException e) {
+//            log.error("Unable to set DCC Public IP Address!!", e);
+//        }
 
-    public void setPircBotX(PircBotX pircBotX) {
-        this.pircBotX = pircBotX;
-    }
+		return cb.buildConfiguration();
+	}
 
-    public Autoadd getAutoadd() {
-        return autoadd;
-    }
+	public PircBotX getBot() {
+		return this.pircBotX;
+	}
 
-    public void setAutoadd(Autoadd autoadd) {
-        this.autoadd = autoadd;
-    }
+	public PircBotX getPircBotX() {
+		return pircBotX;
+	}
+
+	public void setPircBotX(PircBotX pircBotX) {
+		this.pircBotX = pircBotX;
+	}
 
 }
