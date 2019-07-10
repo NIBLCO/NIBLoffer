@@ -35,7 +35,7 @@ public class BotConfiguration {
         // dccPorts.add(47472);
         // dccPorts.add(47473);
         // cb.setDccPorts(dccPorts);
-        cb.setDccTransferBufferSize(1024);
+        cb.setDccTransferBufferSize(1024 * 4);
         // try {
         // cb.setDccPublicAddress(InetAddress.getByName("116.203.134.128"));
         // } catch (UnknownHostException e) {

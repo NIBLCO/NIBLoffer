@@ -1,4 +1,4 @@
-package com.nibl.bot.model;
+package com.nibl.bot.service.autoadd;
 
 import java.util.ArrayList;
 import java.util.List;

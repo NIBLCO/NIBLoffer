@@ -10,7 +10,7 @@ public class DCCUser {
 
     private User user;
     private Date lastTransfer = new Date();
-    private List<DCCTransfer> transfers = new ArrayList<>();
+    private List<DCCRequest> transfers = new ArrayList<>();
 
     public DCCUser(User user) {
         this.user = user;
@@ -28,12 +28,16 @@ public class DCCUser {
         this.lastTransfer = new Date();
     }
 
-    public void addTransfer(DCCTransfer transfer) {
+    public void addTransfer(DCCRequest transfer) {
         transfers.add(transfer);
     }
 
-    public List<DCCTransfer> getTransfers() {
+    public List<DCCRequest> getTransfers() {
         return transfers;
+    }
+
+    public void sendUserMessage(String message) {
+        this.getUser().send().message(message);
     }
 
 }

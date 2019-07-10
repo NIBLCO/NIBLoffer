@@ -1,4 +1,4 @@
-package com.nibl.bot.model;
+package com.nibl.bot.service.autoadd;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -16,7 +16,7 @@ public class BotDirectory {
 
     String absolutePath;
     Map<String, BotDirectory> subDirectories = new HashMap<>();
-    Map<String,BotFile> files = new HashMap<>();
+    Map<String, BotFile> files = new HashMap<>();
 
     public String getAbsolutePath() {
         return absolutePath;
@@ -50,11 +50,11 @@ public class BotDirectory {
         this.subDirectories = subDirectories;
     }
 
-    public Map<String,BotFile> getFiles() {
+    public Map<String, BotFile> getFiles() {
         return files;
     }
 
-    public void setFiles(Map<String,BotFile> files) {
+    public void setFiles(Map<String, BotFile> files) {
         this.files = files;
         for (String file : this.files.keySet()) {
             this.files.get(file).setDirectory(this);

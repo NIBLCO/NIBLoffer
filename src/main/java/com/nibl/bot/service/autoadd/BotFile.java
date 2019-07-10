@@ -1,9 +1,10 @@
-package com.nibl.bot.model;
+package com.nibl.bot.service.autoadd;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.nibl.bot.util.BotUtility;
 
 public class BotFile {
 
@@ -58,12 +59,16 @@ public class BotFile {
         this.name = name;
     }
 
-
     public Integer getGets() {
         return gets;
     }
 
     public void setGets(Integer gets) {
         this.gets = gets;
+    }
+
+    @JsonIgnore
+    public String getFormattedSize() {
+        return BotUtility.bytesToHuman(this.attributes.size());
     }
 }

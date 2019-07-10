@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nibl.bot.Bot;
-import com.nibl.bot.model.BotDirectory;
-import com.nibl.bot.model.BotFile;
 import com.nibl.bot.service.Service;
 import com.nibl.bot.service.packlist.PacklistService;
 
@@ -26,8 +24,8 @@ public class AutoaddService extends Service {
 
     private static Logger log = LoggerFactory.getLogger(AutoaddService.class);
     private static Boolean verbose = false;
-//    private static Path rootScanPath = Paths.get("/mnt/unionfs");
-    private static Path rootScanPath = Paths.get("D:\\Downlewds");
+    private static Path rootScanPath = Paths.get("/mnt/unionfs");
+    // private static Path rootScanPath = Paths.get("D:\\Downlewds");
     private static Path stateFile = Paths.get("directoryState.json");
     private static ObjectMapper mapper = new ObjectMapper();
     private static Integer fileCounter = 0;

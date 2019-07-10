@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nibl.bot.Bot;
 import com.nibl.bot.BotInterface;
-import com.nibl.bot.service.dcc.DCCServiceManager;
+import com.nibl.bot.service.dcc.DCCManager;
 
 public class Listener extends BotInterface {
 
@@ -42,7 +42,7 @@ public class Listener extends BotInterface {
         public void onPrivateMessage(PrivateMessageEvent event) {
             log.info("[PMESSAGE] {}: {}", event.getUser().getNick(), event.getMessage());
             if (event.getMessage().toLowerCase().startsWith("xdcc")) {
-                DCCServiceManager.addRequest(event);
+                DCCManager.addRequest(event);
             }
         }
 
