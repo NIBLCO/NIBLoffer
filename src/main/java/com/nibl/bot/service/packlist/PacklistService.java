@@ -22,7 +22,7 @@ public class PacklistService extends Service {
 	private static Logger log = LoggerFactory.getLogger(PacklistService.class);
 
 	private static BotPacklist packlist = new BotPacklist();
-	private static BotFile packlistFile = new BotFile();
+//	private static BotFile packlistFile = new BotFile();
 
 	public PacklistService(Bot myBot) {
 		super(myBot);
@@ -37,8 +37,10 @@ public class PacklistService extends Service {
 		try {
 			outputPacklist();
 			BotFile file = new BotFile();
-			file.setPath(Paths.get(myBot.getPircBotX().getNick() + ".txt"));
-			packlistFile = file;
+			file.setName(myBot.getPircBotX().getNick() + ".txt");
+			file.setPath(Paths.get(file.getName()));
+			file.setId(-1);
+			packlist.getFiles().add(file);
 		} catch (IOException e) {
 			log.error("Failed writing packlist to disk!", e);
 		}
@@ -59,15 +61,8 @@ public class PacklistService extends Service {
 				.collect(Collectors.toList());
 	}
 
-	public static BotFile getBotFileByPackNumber(Integer packNumber) {
-		if (packNumber == -1) {
-			return packlistFile;
-		}
-		if (packlist.getFiles().size() <= packNumber) {
-			return packlist.getFiles().get(packNumber);
-		} else {
-			return null;
-		}
+	public static List<BotFile> getBotFilesByPackNumbers(List<Integer> packNumbers) {
+		return packlist.getFiles().stream().filter(f -> packNumbers.contains(f.getId())).collect(Collectors.toList());
 	}
 
 	private static void outputPacklist() throws IOException {
@@ -87,9 +82,9 @@ public class PacklistService extends Service {
 		Files.write(Paths.get(myBot.getPircBotX().getNick() + ".txt"), output.toString().getBytes());
 	}
 
-    @Override
-    public void executeTask() {
+	@Override
+	public void executeTask() {
 
-    }
+	}
 
 }

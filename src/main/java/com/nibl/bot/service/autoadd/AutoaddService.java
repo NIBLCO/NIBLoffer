@@ -26,7 +26,8 @@ public class AutoaddService extends Service {
 
     private static Logger log = LoggerFactory.getLogger(AutoaddService.class);
     private static Boolean verbose = false;
-    private static Path rootScanPath = Paths.get("/mnt/unionfs");
+//    private static Path rootScanPath = Paths.get("/mnt/unionfs");
+    private static Path rootScanPath = Paths.get("D:\\Downlewds");
     private static Path stateFile = Paths.get("directoryState.json");
     private static ObjectMapper mapper = new ObjectMapper();
     private static Integer fileCounter = 0;
