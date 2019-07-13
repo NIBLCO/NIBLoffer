@@ -1,5 +1,7 @@
 package com.nibl.bot;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
@@ -24,21 +26,21 @@ public class Bot {
 	private Properties properties;
 	private ServiceManager serviceManager;
 
-	public Bot() throws IOException, IrcException, InterruptedException, ExecutionException {
-		initializeResources();
+	public Bot(String configFile) throws IOException, IrcException, InterruptedException, ExecutionException {
+		initializeResources(configFile);
 		pircBotX.startBot();
 	}
 
-	private void initializeResources()
+	private void initializeResources(String configFile)
 			throws InterruptedException, ExecutionException, FileNotFoundException, IOException {
 		Integer maxTransfers = 10;
 
 		properties = new Properties();
 
 		try {
-			properties.load(getClass().getClassLoader().getResourceAsStream("configuration.properties"));
+			properties.load(new FileInputStream(new File(configFile)));
 		} catch (FileNotFoundException e) {
-			log.error("Config file not found {}", "configuration.properties");
+			log.error("Config file not found.");
 			throw e;
 		}
 
@@ -84,7 +86,11 @@ public class Bot {
 	}
 
 	public static void main(String[] args) throws Exception {
-		new Bot();
+		if (args.length == 0) {
+			System.out.println("need a path to config");
+			System.exit(2);
+		}
+		new Bot(args[0]);
 	}
 
 }
