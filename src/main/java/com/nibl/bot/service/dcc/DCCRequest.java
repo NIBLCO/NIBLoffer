@@ -56,19 +56,20 @@ public class DCCRequest extends Service {
 	}
 
 	private void messageUserStart() {
-		this.getDCCUser().sendUserMessage(String.format("Sending you #%s [%s] %s", this.getBotFile().getId(),
+		this.getDCCUser().sendUserNotice(String.format("Sending you #%s [%s] %s", this.getBotFile().getId(),
 				this.getBotFile().getFormattedSize(), this.getBotFile().getName()));
 	}
 
 	private void messageUserFinish() {
-		this.getDCCUser().sendUserMessage(
-				String.format("Finished sending %s. This is new software, Please report errors to Jenga.",
+		this.getDCCUser()
+				.sendUserNotice(String.format(
+						"Finished sending %s. Problems? Let us know: https://github.com/NIBLCO/NIBLoffer/issues",
 						this.getBotFile().getName()));
 		// If credit line, send?
 	}
 
 	private void messageUserError() {
-		this.getDCCUser().sendUserMessage(String.format(
+		this.getDCCUser().sendUserNotice(String.format(
 				"Failed sending %s. This is new software, Jenga will review the logs.", this.getBotFile().getName()));
 	}
 

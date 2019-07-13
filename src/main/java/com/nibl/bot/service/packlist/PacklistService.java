@@ -1,5 +1,6 @@
 package com.nibl.bot.service.packlist;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,79 +22,88 @@ import com.nibl.bot.util.BotUtility;
 
 public class PacklistService extends Service {
 
-    private static Logger log = LoggerFactory.getLogger(PacklistService.class);
+	private static Logger log = LoggerFactory.getLogger(PacklistService.class);
 
-    private static BotPacklist packlist = new BotPacklist();
+	private static BotPacklist packlist = new BotPacklist();
 
-    public PacklistService(Bot myBot) {
-        super(myBot);
-    }
+	public PacklistService(Bot myBot) {
+		super(myBot);
+	}
 
-    public static BotPacklist getPacklist() {
-        return packlist;
-    }
+	public static BotPacklist getPacklist() {
+		return packlist;
+	}
 
-    public static void makePacklist(BotDirectory directory) {
-        packlist.setFiles(orderPacklist(recurseDirectory(directory, new BotPacklist())));
-        try {
-            outputPacklist();
-            packlist.getFiles().add(makePacklistfile());
-        } catch (IOException e) {
-            log.error("Failed writing packlist to disk!", e);
-        }
-    }
+	public static Path getPackListPath() {
+		Path packList = Paths.get("packlist");
+		if (!packList.toFile().exists()) {
+			packList.toFile().mkdir();
+		}
+		return Paths.get(packList.getFileName() + File.separator
+				+ BotUtility.cleanFileName(myBot.getPircBotX().getNick() + ".txt"));
+	}
 
-    private static BotFile makePacklistfile() throws IOException {
-        Path path = Paths.get(myBot.getPircBotX().getNick() + ".txt");
-        BotFile file = new BotFile();
-        file.setName(path.getFileName().toString());
-        file.setPath(Paths.get(file.getName()));
-        file.setId(-1);
-        file.setDirectory(null);
-        file.setPath(path);
-        file.setAttributes(Files.readAttributes(path, BasicFileAttributes.class));
-        return file;
-    }
+	public static void makePacklist(BotDirectory directory) {
+		packlist.setFiles(orderPacklist(recurseDirectory(directory, new BotPacklist())));
+		try {
+			outputPacklist();
+			packlist.getFiles().add(makePacklistfile());
+		} catch (IOException e) {
+			log.error("Failed writing packlist to disk!", e);
+		}
+	}
 
-    private static BotPacklist recurseDirectory(BotDirectory directory, BotPacklist packlist) {
-        for (BotDirectory file : directory.getSubDirectories().values()) {
-            recurseDirectory(file, packlist);
-        }
-        for (BotFile file : directory.getFiles().values()) {
-            packlist.getFiles().add(file);
-        }
-        return packlist;
-    }
+	private static BotFile makePacklistfile() throws IOException {
+		Path path = getPackListPath();
+		BotFile file = new BotFile();
+		file.setName(path.getFileName().toString());
+		file.setPath(path);
+		file.setId(-1);
+		file.setDirectory(null);
+		file.setPath(path);
+		file.setAttributes(Files.readAttributes(path, BasicFileAttributes.class));
+		return file;
+	}
 
-    private static List<BotFile> orderPacklist(BotPacklist packlist) {
-        return packlist.getFiles().stream().sorted(Comparator.comparingInt(BotFile::getId))
-                .collect(Collectors.toList());
-    }
+	private static BotPacklist recurseDirectory(BotDirectory directory, BotPacklist packlist) {
+		for (BotDirectory file : directory.getSubDirectories().values()) {
+			recurseDirectory(file, packlist);
+		}
+		for (BotFile file : directory.getFiles().values()) {
+			packlist.getFiles().add(file);
+		}
+		return packlist;
+	}
 
-    public static List<BotFile> getBotFilesByPackNumbers(List<Integer> packNumbers) {
-        return packlist.getFiles().stream().filter(f -> packNumbers.contains(f.getId())).collect(Collectors.toList());
-    }
+	private static List<BotFile> orderPacklist(BotPacklist packlist) {
+		return packlist.getFiles().stream().sorted(Comparator.comparingInt(BotFile::getId))
+				.collect(Collectors.toList());
+	}
 
-    private static void outputPacklist() throws IOException {
-        long totalOffered = 0;
-        StringBuilder output = new StringBuilder();
-        output.append("** To request a file, type \"/MSG " + myBot.getPircBotX().getNick() + " XDCC SEND x\" **");
-        output.append("\n");
+	public static List<BotFile> getBotFilesByPackNumbers(List<Integer> packNumbers) {
+		return packlist.getFiles().stream().filter(f -> packNumbers.contains(f.getId())).collect(Collectors.toList());
+	}
 
-        for (BotFile file : packlist.getFiles()) {
-            totalOffered += file.getAttributes().size();
-            output.append("#" + file.getId() + "  " + file.getGets() + "x [" + file.getFormattedSize() + "] "
-                    + file.getName());
-            output.append("\n");
-        }
-        output.append("Total Offered: " + BotUtility.bytesToHuman(totalOffered));
-        output.append("\n");
-        Files.write(Paths.get(myBot.getPircBotX().getNick() + ".txt"), output.toString().getBytes());
-    }
+	private static void outputPacklist() throws IOException {
+		long totalOffered = 0;
+		StringBuilder output = new StringBuilder();
+		output.append("** To request a file, type \"/MSG " + myBot.getPircBotX().getNick() + " XDCC SEND x\" **");
+		output.append("\n");
 
-    @Override
-    public void executeTask() {
-        // Put an HTTP server here for the packlist
-    }
+		for (BotFile file : packlist.getFiles()) {
+			totalOffered += file.getAttributes().size();
+			output.append("#" + file.getId() + "  " + file.getGets() + "x [" + file.getFormattedSize() + "] "
+					+ file.getName());
+			output.append("\n");
+		}
+		output.append("Total Offered: " + BotUtility.bytesToHuman(totalOffered));
+		output.append("\n");
+		Files.write(getPackListPath(), output.toString().getBytes());
+	}
+
+	@Override
+	public void executeTask() {
+		// Put an HTTP server here for the packlist
+	}
 
 }

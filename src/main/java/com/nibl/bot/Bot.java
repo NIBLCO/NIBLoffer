@@ -1,6 +1,8 @@
 package com.nibl.bot;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 import org.pircbotx.PircBotX;
@@ -15,52 +17,74 @@ import com.nibl.bot.service.dcc.DCCManager;
 
 public class Bot {
 
-    private Logger log = LoggerFactory.getLogger(Bot.class);
+	private Logger log = LoggerFactory.getLogger(Bot.class);
 
-    private PircBotX pircBotX = new PircBotX(BotConfiguration.createConfiguration(this));;
+	private PircBotX pircBotX;
 
-    private ServiceManager serviceManager;
+	private Properties properties;
+	private ServiceManager serviceManager;
 
-    public Bot() throws IOException, IrcException, InterruptedException, ExecutionException {
-        initializeResources();
-        pircBotX.startBot();
-    }
+	public Bot() throws IOException, IrcException, InterruptedException, ExecutionException {
+		initializeResources();
+		pircBotX.startBot();
+	}
 
-    private void initializeResources() throws InterruptedException, ExecutionException {
-        Integer maxTransfers = 10;
-        this.setServiceManager(new ServiceManager(this, maxTransfers, 10));
+	private void initializeResources()
+			throws InterruptedException, ExecutionException, FileNotFoundException, IOException {
+		Integer maxTransfers = 10;
 
-        // Run Autoadd once before startup
-        log.info("Running Autoadd service once before startup");
-        this.getServiceManager().addService(new AutoaddService(this, true)).get();
+		properties = new Properties();
 
-        // Add scheduled AutoaddService every 60s
-        this.getServiceManager().addScheduledService(new AutoaddService(this), 60, 60);
+		try {
+			properties.load(getClass().getClassLoader().getResourceAsStream("configuration.properties"));
+		} catch (FileNotFoundException e) {
+			log.error("Config file not found {}", "configuration.properties");
+			throw e;
+		}
 
-        this.getServiceManager().addScheduledService(new DCCManager(this), 1, 1);
+		pircBotX = new PircBotX(BotConfiguration.createConfiguration(this));
 
-        this.getServiceManager().addScheduledService(new DCCActiveQueue(this), 1, 1);
+		this.setServiceManager(new ServiceManager(this, maxTransfers, 10));
 
-    }
+		// Run Autoadd once before startup
+		log.info("Running Autoadd service once before startup");
+		this.getServiceManager().addService(new AutoaddService(this, true)).get();
 
-    public PircBotX getPircBotX() {
-        return pircBotX;
-    }
+		// Add scheduled AutoaddService every 60s
+		this.getServiceManager().addScheduledService(new AutoaddService(this), 60, 60);
 
-    public void setPircBotX(PircBotX pircBotX) {
-        this.pircBotX = pircBotX;
-    }
+		this.getServiceManager().addScheduledService(new DCCManager(this), 1, 1);
 
-    public ServiceManager getServiceManager() {
-        return serviceManager;
-    }
+		this.getServiceManager().addScheduledService(new DCCActiveQueue(this), 1, 1);
 
-    public void setServiceManager(ServiceManager serviceManager) {
-        this.serviceManager = serviceManager;
-    }
+	}
 
-    public static void main(String[] args) throws Exception {
-        new Bot();
-    }
+	public String getProperty(String key) {
+		return this.properties.getProperty(key);
+	}
+
+	public String getProperty(String key, String defaultValue) {
+		return this.properties.getProperty(key, defaultValue);
+	}
+
+	public PircBotX getPircBotX() {
+		return pircBotX;
+	}
+
+	public void setPircBotX(PircBotX pircBotX) {
+		this.pircBotX = pircBotX;
+	}
+
+	public ServiceManager getServiceManager() {
+		return serviceManager;
+	}
+
+	public void setServiceManager(ServiceManager serviceManager) {
+		this.serviceManager = serviceManager;
+	}
+
+	public static void main(String[] args) throws Exception {
+		new Bot();
+	}
 
 }
