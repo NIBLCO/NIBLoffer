@@ -69,20 +69,20 @@ public class Listener extends BotInterface {
 
         @Override
         public void onIncomingFileTransfer(IncomingFileTransferEvent event) throws Exception {
-            try {
-                super.onIncomingFileTransfer(event);
-                Path path = Paths.get(myBot.getProperty("data_directory") + File.separator + event.getSafeFilename());
-                if (path.toFile().exists()) {
-                    BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
-                    log.info("Resume from position {} for file {}", attr.size(), event.getSafeFilename());
-                    event.acceptResume(path.toFile(), attr.size());
-                } else {
-                    log.info("Accept file {}", event.getSafeFilename());
-                    event.accept(path.toFile());
-                }
-            } catch (Exception e) {
-                log.error("Exception on incoming file", e);
-            }
+//            try {
+//                super.onIncomingFileTransfer(event);
+//                Path path = Paths.get(myBot.getProperty("data_directory") + File.separator + event.getSafeFilename());
+//                if (path.toFile().exists()) {
+//                    BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+//                    log.info("Resume from position {} for file {}", attr.size(), event.getSafeFilename());
+//                    event.acceptResume(path.toFile(), attr.size());
+//                } else {
+//                    log.info("Accept file {}", event.getSafeFilename());
+//                    event.accept(path.toFile());
+//                }
+//            } catch (Exception e) {
+//                log.error("Exception on incoming file", e);
+//            }
         }
 
         @Override
