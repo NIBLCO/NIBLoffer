@@ -8,40 +8,40 @@ import org.pircbotx.User;
 
 public class DCCUser {
 
-	private User user;
-	private Date lastTransfer = new Date();
-	private List<DCCRequest> transfers = new ArrayList<>();
+    private User user;
+    private Date lastTransfer = new Date();
+    private List<DCCRequest> transfers = new ArrayList<>();
 
-	public DCCUser(User user) {
-		this.user = user;
-	}
+    public DCCUser(User user) {
+        this.user = user;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public Date getLastTransfer() {
-		return lastTransfer;
-	}
+    public Date getLastTransfer() {
+        return lastTransfer;
+    }
 
-	public void sentTransfer() {
-		this.lastTransfer = new Date();
-	}
+    public void sentTransfer() {
+        this.lastTransfer = new Date();
+    }
 
-	public void addTransfer(DCCRequest transfer) {
-		transfers.add(transfer);
-	}
+    public void addTransfer(DCCRequest transfer) {
+        transfers.add(transfer);
+    }
 
-	public List<DCCRequest> getTransfers() {
-		return transfers;
-	}
+    public List<DCCRequest> getTransfers() {
+        return transfers;
+    }
 
-	public void sendUserMessage(String message) {
-		this.getUser().send().message(message);
-	}
+    public void sendUserMessage(String message) {
+        this.getUser().send().message(message);
+    }
 
-	public void sendUserNotice(String message) {
-		this.getUser().send().notice(message);
-	}
+    public void sendUserNotice(String message) {
+        this.getUser().send().notice(message);
+    }
 
 }

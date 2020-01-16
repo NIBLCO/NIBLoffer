@@ -12,7 +12,8 @@
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<File>logs/bot.log</File>
 		<encoder>
-			<pattern>%d{HH:mm:ss,SSS} %contextName [%thread] %-5level %class{32}[%method]-%line - %msg%n</pattern>
+			<pattern>%d{HH:mm:ss,SSS} %contextName [%thread] %-5level
+				%class{32}[%method]-%line - %msg%n</pattern>
 		</encoder>
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -23,7 +24,8 @@
 
 	<logger name="org.pircbotx" level="ERROR" />
 
-	<root level="DEBUG">
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />
 	</root>
 
